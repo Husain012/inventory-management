@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="header">
+    <h2>Inventory</h2>
+    <a routerLink="/products/new" class="btn-add">+ Add Product</a>
+  </div>
+
+  <p *ngIf="loading">Loading products...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <table *ngIf="!loading && products.length > 0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of products">
+        <td>{{ p.Name }}</td>
+        <td>{{ p.Category }}</td>
+        <td>{{ p.Quantity }}</td>
+        <td>{{ p.Price | currency }}</td>
+        <td>
+          <a [routerLink]="['/products', p.id, 'edit']">Edit</a>
+          <button (click)="deleteProduct(p.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && products.length === 0">No products found.</p>
+</div>

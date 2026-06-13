@@ -1,0 +1,34 @@
+<div class="container">
+  <h2>{{ isEditMode ? 'Edit' : 'Add' }} Product</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" formControlName="name" />
+      <span class="error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+        Name is required
+      </span>
+    </div>
+
+    <div class="field">
+      <label>Category</label>
+      <input type="text" formControlName="category" />
+      <span class="error" *ngIf="form.get('category')?.invalid && form.get('category')?.touched">
+        Category is required
+      </span>
+    </div>
+
+    <div class="field">
+      <label>Quantity</label>
+      <input type="number" formControlName="quantity" />
+    </div>
+
+    <div class="field">
+      <label>Price</label>
+      <input type="number" step="0.01" formControlName="price" />
+    </div>
+
+    <button type="submit" [disabled]="form.invalid">Save</button>
+    <a routerLink="/products">Cancel</a>
+  </form>
+</div>
