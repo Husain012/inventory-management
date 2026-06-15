@@ -1,49 +1,103 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Product } from '../models/product';
 import { ProductService } from '../services/product';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, CurrencyPipe],
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-list.html',
-  styleUrls: ['./product-list.css']
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
-  loading = true;
-  error = '';
+  allProducts: Product[] = [];
+  loading = false;
 
-  constructor(private productService: ProductService) { }
+  // Toast
+  toastMessage = '';
+  toastType = '';
+  showToast = false;
 
-  ngOnInit(): void {
-    this.loadProducts();
-  }
+  // Delete modal
+  showDeleteModal = false;
+  deleteTargetId: number | null = null;
 
-  loadProducts(): void {
-    this.loading = true;
+  constructor(
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef
+  ) {}
+  ngOnInit() {
     this.productService.getAll().subscribe({
-    next: (data: Product[]) => {
-        this.products = data;
-        this.loading = false;
+      next: (data) => {
+        this.allProducts = [...data];
+        this.products = [...data];
+        this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        this.error = 'Failed to load products';
-        this.loading = false;
-        console.error(err);
-      }
+      error: (err) => console.error('Error:', err)
     });
   }
 
-  deleteProduct(id: number | undefined): void {
-    if (!id) return;
-    if (!confirm('Delete this product?')) return;
+  onSearch(event: Event) {
+    const value = (event.target as HTMLInputElement).value.toLowerCase();
+    this.products = this.allProducts.filter(p =>
+      p.name.toLowerCase().includes(value) ||
+      p.category.toLowerCase().includes(value)
+    );
+  }
 
-    this.productService.delete(id).subscribe({
-      next: () => this.loadProducts(),
-      error: (err: any) => console.error(err)
+  confirmDelete(id: number) {
+    this.deleteTargetId = id;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.deleteTargetId = null;
+  }
+
+  deleteProduct() {
+    if (!this.deleteTargetId) return;
+    this.productService.delete(this.deleteTargetId).subscribe(() => {
+      this.products = this.products.filter(p => p.id !== this.deleteTargetId);
+      this.allProducts = this.allProducts.filter(p => p.id !== this.deleteTargetId);
+      this.showDeleteModal = false;
+      this.deleteTargetId = null;
+      this.cdr.detectChanges();
+      this.showToastMessage('Product deleted successfully!', 'success');
     });
   }
+
+  showToastMessage(message: string, type: string) {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    setTimeout(() => {
+      this.showToast = false;
+      this.cdr.detectChanges();
+    }, 3000);
+  }
+
+  getTotalValue(): number {
+    return this.allProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+  }
+
+  getCategories(): number {
+    return new Set(this.allProducts.map(p => p.category)).size;
+  }
+  getStockStatus(product: Product): string {
+  if (product.quantity === 0) return 'out';
+  if (product.quantity <= product.lowStockThreshold) return 'low';
+  return 'ok';
+}
+
+getLowStockProducts(): Product[] {
+  return this.allProducts.filter(p => p.quantity <= p.lowStockThreshold);
+}
+getLowStockCount(): number {
+  return this.allProducts.filter(p => 
+    p.quantity <= p.lowStockThreshold
+  ).length;
+}
 }

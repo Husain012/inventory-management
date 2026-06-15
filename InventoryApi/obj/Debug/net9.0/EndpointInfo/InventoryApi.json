@@ -155,6 +155,10 @@
           "price": {
             "type": "number",
             "format": "double"
+          },
+          "lowStockThreshold": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

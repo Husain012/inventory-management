@@ -5,6 +5,6 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
   { path: 'products', component: ProductListComponent },
-  { path: 'products/new', component: ProductFormComponent },
-  { path: 'products/:id/edit', component: ProductFormComponent }
+  { path: 'products/add', component: ProductFormComponent },      
+  { path: 'products/edit/:id', component: ProductFormComponent }  
 ];

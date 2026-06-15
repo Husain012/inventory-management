@@ -1,7 +1,8 @@
 export interface Product {
     id?:number;
-    Name:string;
-    Category:string;
-    Quantity:number;
-    Price:number
+    name:string;
+    category:string;
+    quantity:number;
+    price:number;
+     lowStockThreshold: number;
 }

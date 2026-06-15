@@ -1,35 +1,152 @@
-<div class="container">
-  <div class="header">
-    <h2>Inventory</h2>
-    <a routerLink="/products/new" class="btn-add">+ Add Product</a>
+<div class="min-h-screen bg-gray-100 p-6">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">📦 Inventory</h1>
+      <a routerLink="/products/add"
+         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        + Add Product
+      </a>
+    </div>
+
+    <!-- Stats Cards — 4 columns now -->
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="bg-blue-100 text-blue-600 rounded-full p-3 text-2xl">📦</div>
+        <div>
+          <p class="text-sm text-gray-500">Total Products</p>
+          <p class="text-2xl font-bold text-gray-800">{{ allProducts.length }}</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="bg-green-100 text-green-600 rounded-full p-3 text-2xl">💰</div>
+        <div>
+          <p class="text-sm text-gray-500">Total Value</p>
+          <p class="text-2xl font-bold text-gray-800">₹{{ getTotalValue() | number:'1.0-0' }}</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="bg-purple-100 text-purple-600 rounded-full p-3 text-2xl">🏷️</div>
+        <div>
+          <p class="text-sm text-gray-500">Categories</p>
+          <p class="text-2xl font-bold text-gray-800">{{ getCategories() }}</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="bg-red-100 text-red-600 rounded-full p-3 text-2xl">⚠️</div>
+        <div>
+          <p class="text-sm text-gray-500">Low Stock</p>
+          <p class="text-2xl font-bold text-red-600">{{ getLowStockCount() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Low Stock Alert Banner -->
+    <div *ngIf="getLowStockCount() > 0"
+         class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+      <span class="text-2xl">⚠️</span>
+      <div>
+        <p class="font-semibold text-red-700">Low Stock Alert!</p>
+        <p class="text-sm text-red-500">
+          {{ getLowStockCount() }} product(s) running low:
+          <strong>{{ getLowStockProducts().map(p => p.name).join(', ') }}</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <input type="text" placeholder="Search products..."
+      (input)="onSearch($event)"
+      class="w-full mb-6 px-4 py-2 border border-gray-300 rounded-lg shadow-sm
+             focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-blue-600 text-white">
+          <tr>
+            <th class="px-6 py-3">#</th>
+            <th class="px-6 py-3">Name</th>
+            <th class="px-6 py-3">Category</th>
+            <th class="px-6 py-3">Quantity</th>
+            <th class="px-6 py-3">Price</th>
+            <th class="px-6 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="products.length === 0">
+            <td colspan="6" class="px-6 py-10 text-center text-gray-400">
+              No products found.
+            </td>
+          </tr>
+          <tr *ngFor="let product of products; let i = index"
+              class="border-b hover:bg-gray-50 transition">
+            <td class="px-6 py-4 text-gray-500">{{ i + 1 }}</td>
+            <td class="px-6 py-4 font-medium text-gray-800">{{ product.name }}</td>
+            <td class="px-6 py-4">
+              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
+                {{ product.category }}
+              </span>
+            </td>
+
+            <!-- Quantity with Stock Status badge -->
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                {{ product.quantity }}
+                <span *ngIf="getStockStatus(product) === 'out'"
+                      class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full">
+                  Out of Stock
+                </span>
+                <span *ngIf="getStockStatus(product) === 'low'"
+                      class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full">
+                  Low Stock
+                </span>
+                <span *ngIf="getStockStatus(product) === 'ok'"
+                      class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                  In Stock
+                </span>
+              </div>
+            </td>
+
+            <td class="px-6 py-4 text-green-600 font-semibold">
+              ₹{{ product.price | number:'1.2-2' }}
+            </td>
+            <td class="px-6 py-4 flex gap-2">
+              <a [routerLink]="['/products/edit', product.id]"
+                 class="text-blue-500 hover:underline">Edit</a>
+              <button (click)="confirmDelete(product.id!)"
+                      class="text-red-500 hover:underline">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+</div>
 
-  <p *ngIf="loading">Loading products...</p>
-  <p *ngIf="error" class="error">{{ error }}</p>
+<!-- Toast Notification -->
+<div *ngIf="showToast"
+     class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 z-50">
+  ✅ {{ toastMessage }}
+</div>
 
-  <table *ngIf="!loading && products.length > 0">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Quantity</th>
-        <th>Price</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of products">
-        <td>{{ p.Name }}</td>
-        <td>{{ p.Category }}</td>
-        <td>{{ p.Quantity }}</td>
-        <td>{{ p.Price | currency }}</td>
-        <td>
-          <a [routerLink]="['/products', p.id, 'edit']">Edit</a>
-          <button (click)="deleteProduct(p.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p *ngIf="!loading && products.length === 0">No products found.</p>
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal"
+     class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+    <div class="text-5xl mb-4">🗑️</div>
+    <h2 class="text-xl font-bold text-gray-800 mb-2">Delete Product?</h2>
+    <p class="text-gray-500 mb-6">This action cannot be undone.</p>
+    <div class="flex gap-3">
+      <button (click)="cancelDelete()"
+              class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-lg hover:bg-gray-50">
+        Cancel
+      </button>
+      <button (click)="deleteProduct()"
+              class="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600">
+        Delete
+      </button>
+    </div>
+  </div>
 </div>
