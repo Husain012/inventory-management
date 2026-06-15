@@ -39,6 +39,7 @@ namespace InventoryApi.Controllers
             product.Category = updated.Category;
             product.Quantity = updated.Quantity;
             product.Price = updated.Price;
+            product.LowStockThreshold = updated.LowStockThreshold;
             _db.SaveChanges();
             return NoContent();
         }

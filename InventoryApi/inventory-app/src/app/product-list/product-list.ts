@@ -19,6 +19,8 @@ export class ProductListComponent implements OnInit {
   toastMessage = '';
   toastType = '';
   showToast = false;
+  sortColumn: keyof Product | '' = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   // Delete modal
   showDeleteModal = false;
@@ -39,13 +41,29 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  onSearch(event: Event) {
-    const value = (event.target as HTMLInputElement).value.toLowerCase();
-    this.products = this.allProducts.filter(p =>
-      p.name.toLowerCase().includes(value) ||
-      p.category.toLowerCase().includes(value)
-    );
+  // onSearch(event: Event) {
+  //   const value = (event.target as HTMLInputElement).value.toLowerCase();
+  //   this.products = this.allProducts.filter(p =>
+  //     p.name.toLowerCase().includes(value) ||
+  //     p.category.toLowerCase().includes(value)
+  //   );
+  // }
+  onSearch(event: Event): void {
+
+  const searchTerm =
+    (event.target as HTMLInputElement)
+      .value
+      .toLowerCase();
+
+  this.products = this.allProducts.filter(product =>
+    product.name.toLowerCase().includes(searchTerm) ||
+    product.category.toLowerCase().includes(searchTerm)
+  );
+
+  if (this.sortColumn) {
+    this.sortProducts(this.sortColumn);
   }
+}
 
   confirmDelete(id: number) {
     this.deleteTargetId = id;
@@ -99,5 +117,33 @@ getLowStockCount(): number {
   return this.allProducts.filter(p => 
     p.quantity <= p.lowStockThreshold
   ).length;
+}
+sortProducts(column: keyof Product): void {
+
+  if (this.sortColumn === column) {
+    this.sortDirection =
+      this.sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortColumn = column;
+    this.sortDirection = 'asc';
+  }
+
+  this.products.sort((a, b) => {
+
+    const valueA = a[column];
+    const valueB = b[column];
+
+    if (typeof valueA === 'string' &&
+        typeof valueB === 'string') {
+
+      return this.sortDirection === 'asc'
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
+
+    return this.sortDirection === 'asc'
+      ? Number(valueA) - Number(valueB)
+      : Number(valueB) - Number(valueA);
+  });
 }
 }
