@@ -10,7 +10,7 @@
       </a>
     </div>
 
-    <!-- Stats Cards — 4 columns now -->
+    <!-- Stats Cards -->
     <div class="grid grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
         <div class="bg-blue-100 text-blue-600 rounded-full p-3 text-2xl">📦</div>
@@ -67,51 +67,42 @@
         <thead class="bg-blue-600 text-white">
           <tr>
             <th class="px-6 py-3">#</th>
-            <th
-              class="px-6 py-3 cursor-pointer"
-              (click)="sortProducts('name')">
-              Name
-              <span *ngIf="sortColumn === 'name'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
-              </span>
+            <th class="px-6 py-3 cursor-pointer select-none hover:bg-blue-700"
+                (click)="sortProducts('name')">
+              Name {{ sortColumn === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : '↕' }}
             </th>
-            <th class="px-6 py-3">Category</th>
-            <th
-              class="px-6 py-3 cursor-pointer"
-              (click)="sortProducts('quantity')">
-              Quantity
-              <span *ngIf="sortColumn === 'quantity'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
-              </span>
+            <th class="px-6 py-3 cursor-pointer select-none hover:bg-blue-700"
+                (click)="sortProducts('category')">
+              Category {{ sortColumn === 'category' ? (sortDirection === 'asc' ? '▲' : '▼') : '↕' }}
             </th>
-            <th
-              class="px-6 py-3 cursor-pointer"
-              (click)="sortProducts('price')">
-              Price
-              <span *ngIf="sortColumn === 'price'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
-              </span>
+            <th class="px-6 py-3 cursor-pointer select-none hover:bg-blue-700"
+                (click)="sortProducts('quantity')">
+              Quantity {{ sortColumn === 'quantity' ? (sortDirection === 'asc' ? '▲' : '▼') : '↕' }}
+            </th>
+            <th class="px-6 py-3 cursor-pointer select-none hover:bg-blue-700"
+                (click)="sortProducts('price')">
+              Price {{ sortColumn === 'price' ? (sortDirection === 'asc' ? '▲' : '▼') : '↕' }}
             </th>
             <th class="px-6 py-3">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="products.length === 0">
+          <tr *ngIf="pagedProducts.length === 0">
             <td colspan="6" class="px-6 py-10 text-center text-gray-400">
               No products found.
             </td>
           </tr>
-          <tr *ngFor="let product of products; let i = index"
+          <tr *ngFor="let product of pagedProducts; let i = index"
               class="border-b hover:bg-gray-50 transition">
-            <td class="px-6 py-4 text-gray-500">{{ i + 1 }}</td>
+            <td class="px-6 py-4 text-gray-500">
+              {{ (currentPage - 1) * pageSize + i + 1 }}
+            </td>
             <td class="px-6 py-4 font-medium text-gray-800">{{ product.name }}</td>
             <td class="px-6 py-4">
               <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
                 {{ product.category }}
               </span>
             </td>
-
-            <!-- Quantity with Stock Status badge -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-2">
                 {{ product.quantity }}
@@ -129,7 +120,6 @@
                 </span>
               </div>
             </td>
-
             <td class="px-6 py-4 text-green-600 font-semibold">
               ₹{{ product.price | number:'1.2-2' }}
             </td>
@@ -142,17 +132,52 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination Controls -->
+      <div *ngIf="totalPages > 1"
+           class="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
+        <p class="text-sm text-gray-500">
+          Showing {{ (currentPage - 1) * pageSize + 1 }}
+          to {{ Math.min(currentPage * pageSize, products.length) }}
+          of {{ products.length }} products
+        </p>
+        <div class="flex items-center gap-2">
+          <button (click)="goToPage(currentPage - 1)"
+                  [disabled]="currentPage === 1"
+                  class="px-3 py-1 rounded-lg border text-sm
+                         disabled:opacity-40 disabled:cursor-not-allowed
+                         hover:bg-gray-100 transition">
+            ← Prev
+          </button>
+          <button *ngFor="let page of getPages()"
+                  (click)="goToPage(page)"
+                  [ngClass]="page === currentPage
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'"
+                  class="px-3 py-1 rounded-lg border text-sm transition">
+            {{ page }}
+          </button>
+          <button (click)="goToPage(currentPage + 1)"
+                  [disabled]="currentPage === totalPages"
+                  class="px-3 py-1 rounded-lg border text-sm
+                         disabled:opacity-40 disabled:cursor-not-allowed
+                         hover:bg-gray-100 transition">
+            Next →
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- Toast Notification -->
+<!-- Toast -->
 <div *ngIf="showToast"
      class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 z-50">
   ✅ {{ toastMessage }}
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div *ngIf="showDeleteModal"
      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
   <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">

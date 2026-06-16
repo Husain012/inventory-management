@@ -1,0 +1,114 @@
+.nav-glass {
+  background: rgba(255,255,255,.7);
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  border-bottom: 1px solid rgba(255,255,255,.5);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.05);
+}
+
+.glass {
+  background: rgba(255,255,255,.85);
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  border: 1px solid rgba(255,255,255,.6);
+
+  box-shadow:
+    0 10px 40px rgba(15,23,42,.08);
+
+  transition: all .3s ease;
+}
+
+.glass:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 20px 50px rgba(15,23,42,.12);
+}
+.stat-card {
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 20px;
+  padding: 24px;
+
+  color: white;
+
+  transition: all .35s ease;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.15);
+}
+
+.stat-card:hover {
+  transform:
+    translateY(-8px)
+    scale(1.02);
+
+  box-shadow:
+    0 25px 50px rgba(0,0,0,.2);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+
+  width: 200%;
+  height: 200%;
+
+  background:
+    linear-gradient(
+      45deg,
+      transparent,
+      rgba(255,255,255,.25),
+      transparent
+    );
+}
+
+.stat-card:hover::before {
+  animation: shine 1s ease;
+}
+
+@keyframes shine {
+  from {
+    left: -150%;
+  }
+  to {
+    left: 150%;
+  }
+}
+
+.stat-blue {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+}
+
+.stat-green {
+  background: linear-gradient(135deg, #10B981, #065F46);
+}
+
+.stat-purple {
+  background: linear-gradient(135deg, #8B5CF6, #5B21B6);
+}
+
+.stat-red {
+  background: linear-gradient(135deg, #EF4444, #991B1B);
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-icon {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

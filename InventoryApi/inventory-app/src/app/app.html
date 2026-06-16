@@ -1,1 +1,23 @@
+<nav class="nav-glass px-8 py-4 flex items-center gap-8 sticky top-0 z-40 shadow-sm">
+  <div class="flex items-center gap-2 mr-4">
+    <span class="text-2xl">📱</span>
+    <span class="text-xl font-black bg-gradient-to-r from-blue-600 to-purple-600
+                 bg-clip-text text-transparent">
+      Mobile Shop
+    </span>
+  </div>
+ <a routerLink="/dashboard"
+   routerLinkActive="text-blue-600 font-bold border-b-2 border-blue-600"
+   class="nav-link text-gray-500 hover:text-blue-600 transition-all pb-1 text-sm font-medium">
+  <span class="nav-icon">📊</span>
+  Dashboard
+</a>
+  <a routerLink="/products"
+   routerLinkActive="text-blue-600 font-bold border-b-2 border-blue-600"
+   class="nav-link text-gray-500 hover:text-blue-600 transition-all pb-1 text-sm font-medium">
+  <span class="nav-icon">📦</span>
+  Products
+</a>
+</nav>
+
 <router-outlet></router-outlet>

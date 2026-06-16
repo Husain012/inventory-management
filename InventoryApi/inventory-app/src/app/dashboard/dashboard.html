@@ -1,0 +1,215 @@
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+  <div class="min-h-screen p-6">
+    <div class="max-w-7xl mx-auto">
+
+<div class="hero-banner">
+  <div>
+    <h2 class="text-3xl font-bold">
+      📱 Mobile Inventory Dashboard
+    </h2>
+
+    <p class="mt-2 text-blue-100">
+      Monitor stock levels, inventory value,
+      categories and product performance.
+    </p>
+  </div>
+
+  <div class="hero-icon">
+    📦
+  </div>
+</div>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+      <h1 class="flex items-center gap-3">
+    <span style="font-size: 3rem;">📊</span>
+    <span class="dashboard-title">Dashboard</span>
+    </h1>
+        <p class="text-gray-500 mt-1">Welcome back! Here's your store overview.</p>
+      </div>
+      <a routerLink="/products"
+         class="bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700
+                transition shadow font-medium flex items-center gap-2">
+        📦 Manage Products
+      </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-4 gap-5 mb-8">
+
+ <div class="stats-card bg-gradient-to-br from-blue-500 to-blue-700
+ rounded-2xl p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-blue-100 text-sm font-medium">Total Products</p>
+          <span class="bg-white bg-opacity-20 rounded-xl p-2 text-xl">📦</span>
+        </div>
+        <p class="text-4xl font-bold">{{ totalProducts }}</p>
+        <p class="text-blue-200 text-xs mt-2">Items in inventory</p>
+      </div>
+
+      <div class="stats-card bg-gradient-to-br from-blue-500 to-blue-700
+            rounded-2xl p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-green-100 text-sm font-medium">Total Value</p>
+          <span class="bg-white bg-opacity-20 rounded-xl p-2 text-xl">💰</span>
+        </div>
+        <p class="text-4xl font-bold">₹{{ totalValue | number:'1.0-0' }}</p>
+        <p class="text-green-200 text-xs mt-2">Inventory worth</p>
+      </div>
+
+      <div class="stats-card bg-gradient-to-br from-purple-500 to-purple-700
+                  rounded-2xl p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-purple-100 text-sm font-medium">Categories</p>
+          <span class="bg-white bg-opacity-20 rounded-xl p-2 text-xl">🏷️</span>
+        </div>
+        <p class="text-4xl font-bold">{{ totalCategories }}</p>
+        <p class="text-purple-200 text-xs mt-2">Product categories</p>
+      </div>
+
+      <div class="stats-card bg-gradient-to-br from-red-500 to-rose-700
+                  rounded-2xl p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-red-100 text-sm font-medium">Low Stock</p>
+          <span class="bg-white bg-opacity-20 rounded-xl p-2 text-xl">⚠️</span>
+        </div>
+        <p class="text-4xl font-bold">{{ lowStockCount }}</p>
+        <p class="text-red-200 text-xs mt-2">Need restocking</p>
+      </div>
+
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-2 gap-6 mb-6">
+
+      <!-- Bar Chart -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">Products per Category</h2>
+          <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-medium">
+            Bar Chart
+          </span>
+        </div>
+        <canvas id="barChart" height="200"></canvas>
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">Stock Status</h2>
+          <span class="bg-purple-100 text-purple-600 text-xs px-3 py-1 rounded-full font-medium">
+            Pie Chart
+          </span>
+        </div>
+        <canvas id="pieChart" height="200"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Charts Row 2 + Low Stock Table -->
+    <div class="grid grid-cols-2 gap-6 mb-6">
+
+      <!-- Top 5 Value Chart -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">Top 5 by Value</h2>
+          <span class="bg-green-100 text-green-600 text-xs px-3 py-1 rounded-full font-medium">
+            Bar Chart
+          </span>
+        </div>
+        <canvas id="valueChart" height="200"></canvas>
+      </div>
+
+      <!-- Low Stock Alert Table -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-800">⚠️ Low Stock Items</h2>
+          <span class="bg-red-100 text-red-600 text-xs px-3 py-1 rounded-full font-medium">
+            Needs Attention
+          </span>
+        </div>
+
+        <div *ngIf="lowStockProducts.length === 0"
+             class="text-center text-gray-400 py-8">
+          ✅ All products are well stocked!
+        </div>
+
+        <div class="space-y-3">
+          <div *ngFor="let p of lowStockProducts"
+               class="flex items-center justify-between p-3 bg-red-50
+                      rounded-xl border border-red-100">
+            <div>
+              <p class="font-medium text-gray-800">{{ p.name }}</p>
+              <p class="text-xs text-gray-500">{{ p.category }}</p>
+            </div>
+            <div class="text-right">
+              <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-medium">
+                {{ p.quantity }} left
+              </span>
+              <p class="text-xs text-gray-400 mt-1">Min: {{ p.lowStockThreshold }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Products Table -->
+    <div class="glass-card rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Recent Products</h2>
+        <a routerLink="/products"
+           class="text-blue-600 text-sm hover:underline font-medium">
+          View All →
+        </a>
+      </div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-gray-500 border-b">
+            <th class="text-left pb-3 font-medium">Product</th>
+            <th class="text-left pb-3 font-medium">Category</th>
+            <th class="text-left pb-3 font-medium">Qty</th>
+            <th class="text-left pb-3 font-medium">Price</th>
+            <th class="text-left pb-3 font-medium">Value</th>
+            <th class="text-left pb-3 font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of recentProducts"
+              class="border-b last:border-0 hover:bg-gray-50 transition">
+            <td class="py-3 font-medium text-gray-800">{{ p.name }}</td>
+            <td class="py-3">
+              <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">
+                {{ p.category }}
+              </span>
+            </td>
+            <td class="py-3 text-gray-600">{{ p.quantity }}</td>
+            <td class="py-3 text-gray-600">₹{{ p.price | number:'1.0-0' }}</td>
+            <td class="py-3 font-medium text-green-600">
+              ₹{{ p.price * p.quantity | number:'1.0-0' }}
+            </td>
+            <td class="py-3">
+              <span *ngIf="p.quantity === 0"
+                    class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full">
+                Out of Stock
+              </span>
+              <span *ngIf="p.quantity > 0 && p.quantity <= p.lowStockThreshold"
+                    class="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full">
+                Low Stock
+              </span>
+              <span *ngIf="p.quantity > p.lowStockThreshold"
+                    class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                In Stock
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
