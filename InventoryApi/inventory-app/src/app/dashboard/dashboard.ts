@@ -17,7 +17,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, DecimalPipe],
+  imports: [CommonModule, RouterModule,DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })

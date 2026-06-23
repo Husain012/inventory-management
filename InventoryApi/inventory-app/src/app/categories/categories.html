@@ -1,0 +1,140 @@
+<div class="page-bg min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-4xl font-black">🏷️ Categories</h1>
+        <p class="text-gray-400 text-sm">Manage your product categories</p>
+      </div>
+
+      <button (click)="openAddForm()"
+        class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg">
+        + Add Category
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+
+      <div class="glass p-5 rounded-2xl">
+        <p class="text-sm text-blue-400 font-bold">Total Categories</p>
+        <h2 class="text-3xl font-black">{{ categories.length }}</h2>
+      </div>
+
+      <div class="glass p-5 rounded-2xl">
+        <p class="text-sm text-purple-400 font-bold">Most Recent</p>
+        <h2 class="text-xl font-black">
+          {{ categories.length ? categories[categories.length - 1].name : 'None' }}
+        </h2>
+      </div>
+
+      <div class="glass p-5 rounded-2xl">
+        <p class="text-sm text-green-400 font-bold">Status</p>
+        <h2 class="text-xl font-black">Active</h2>
+      </div>
+
+    </div>
+
+    <!-- GRID -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <div *ngFor="let cat of categories"
+        class="glass rounded-2xl p-5 hover:shadow-xl transition relative">
+
+        <!-- badge -->
+        <div class="absolute top-3 right-3 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+          {{ getProductCount(cat.name) }} products
+        </div>
+
+        <div class="text-3xl mb-3">🏷️</div>
+
+        <h3 class="text-lg font-bold">{{ cat.name }}</h3>
+        <p class="text-sm text-gray-400 mb-4">
+          {{ cat.description || 'No description' }}
+        </p>
+
+        <div class="flex gap-2">
+          <button (click)="openEditForm(cat)"
+            class="flex-1 bg-blue-100 text-blue-600 py-2 rounded-xl text-sm font-bold">
+            Edit
+          </button>
+
+          <button (click)="confirmDelete(cat.id!)"
+            class="flex-1 bg-red-100 text-red-600 py-2 rounded-xl text-sm font-bold">
+            Delete
+          </button>
+        </div>
+
+      </div>
+
+      <!-- EMPTY -->
+      <div *ngIf="categories.length === 0"
+        class="col-span-full text-center p-12 glass rounded-2xl">
+        <p class="text-5xl">🏷️</p>
+        <p class="text-gray-500 font-bold mt-3">No categories yet</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div *ngIf="showForm"
+  class="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+
+  <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+
+    <div class="flex justify-between items-center mb-5">
+      <h2 class="text-xl font-black">
+        {{ isEditMode ? 'Edit Category' : 'Add Category' }}
+      </h2>
+
+      <button (click)="closeForm()" class="text-2xl">✕</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <input
+        formControlName="name"
+        placeholder="Category name"
+        class="w-full border p-3 rounded-xl" />
+
+      <textarea
+        formControlName="description"
+        placeholder="Description"
+        class="w-full border p-3 rounded-xl"></textarea>
+
+      <button
+        type="submit"
+        [disabled]="form.invalid"
+        class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+        {{ isEditMode ? 'Update' : 'Add' }}
+      </button>
+
+    </form>
+  </div>
+  
+</div>
+<!-- DELETE CONFIRMATION MODAL -->
+<div *ngIf="showDeleteModal"
+  class="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+
+  <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl text-center">
+
+    <p class="text-5xl mb-4">🗑️</p>
+    <h2 class="text-xl font-black mb-2">Delete Category?</h2>
+    <p class="text-gray-400 text-sm mb-6">This action cannot be undone.</p>
+
+    <div class="flex gap-3">
+      <button (click)="showDeleteModal = false"
+        class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold">
+        Cancel
+      </button>
+
+      <button (click)="deleteCategory()"
+        class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">
+        Delete
+      </button>
+    </div>
+
+  </div>
+</div>
